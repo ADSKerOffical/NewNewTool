@@ -1,0 +1,28 @@
+player = player or game.Players.LocalPlayer
+local tool = Instance.new("Tool", player:WaitForChild("Backpack"))
+tool.Name = "Failure"
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+handle.Size = Vector3.new(1.5, 1.5, 1.5)
+handle.Material = "Neon"
+handle.Color = Color3.new(1, 1, 1)
+
+for _, side in next, Enum.NormalId:GetEnumItems() do
+   local dec = Instance.new("Decal", handle)
+   dec.Texture = "rbxassetid://18950804817"
+   dec.Face = side
+end
+
+local particle = Instance.new("ParticleEmitter", handle)
+particle.Size = NumberSequence.new(1.25, 0)
+particle.Lifetime = NumberRange.new(0.05, 0.05)
+particle.Rate = 60
+particle.Speed = NumberRange.new(0, 0)
+particle.Texture = "rbxassetid://7144894845"
+
+local static = Instance.new("Sound", handle)
+static.Name = "Static"
+static.SoundId = "rbxassetid://140217414944350"
+static.Looped = true
+static:Play()
