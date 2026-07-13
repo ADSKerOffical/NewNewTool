@@ -1,0 +1,67 @@
+player = player or game.Players.LocalPlayer
+local tool = Instance.new("Tool", player:WaitForChild("Backpack"))
+tool.Name = "514p"
+tool.ToolTip = "GLITCH SLAP"
+tool.RequiresHandle = false
+tool:SetAttribute("Tool_Type", "Melee")
+tool:SetAttribute("Tool_Rare", "Super Rare")
+tool:SetAttribute("Tool_Craft", "Slap, Failure")
+
+local lastPressTime = 0
+tool.Activated:Connect(function()
+  local currentTime = tick()
+            if currentTime - lastPressTime >= 2 then
+                lastPressTime = currentTime 
+local owner = tool.Parent
+local pos = owner.HumanoidRootPart.CFrame
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://243827693"
+game.Debris:AddItem(Anim, 3)
+
+local k = owner.Humanoid:LoadAnimation(Anim)
+k:Play()
+k:AdjustSpeed(1)
+   task.wait(.35)
+owner.HumanoidRootPart.CFrame = owner.HumanoidRootPart.CFrame * CFrame.new(0, 0, -10)
+local humanoids = {}
+for _, part in next, workspace:GetPartBoundsInRadius(owner.HumanoidRootPart.Position, 10) do
+    if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(owner) then
+      if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+        table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
+      end
+    end
+  end
+
+for _, humanoid in next, humanoids do
+   humanoid:TakeDamage(30)
+   humanoid.Sit = true
+   humanoid.RootPart.CFrame = pos
+   
+   local sound = Instance.new("Sound", humanoid.RootPart)
+   sound.SoundId = "rbxassetid://140043289814504"
+   sound.Volume = 1
+   sound.PlaybackSpeed = 1
+   sound.Looped = false
+   sound:Play()
+   game.Debris:AddItem(sound, 5)
+end
+   end
+end)
+
+tool.Equipped:Connect(function()
+   local owner = tool.Parent
+   task.spawn(function()
+      local accel = Instance.new("ParticleEmitter", owner:FindFirstChild("Right Arm"))
+      accel.Speed = NumberRange.new(0, 0)
+      accel.Lifetime = NumberRange.new(1, 2)
+      accel.Acceleration = Vector3.new(0, 2, 0)
+      accel.Size = NumberSequence.new(1, 0)
+      accel.RotSpeed = NumberRange.new(-90, 90)
+      accel.SpreadAngle = Vector2.new(-360, 360)
+      accel.Brightness = 1.5
+      accel.Rate = 20
+      accel.Texture = "https://www.roblox.com/asset-thumbnail/image?assetId=3128134660&width=432&height=432&format=png"
+        tool.Unequipped:Wait()
+      accel:Destroy()
+   end)
+end)
