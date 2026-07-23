@@ -1,0 +1,95 @@
+player = player or game.Players.LocalPlayer
+local tool = Instance.new("Tool", player:WaitForChild("Backpack"))
+tool.Name = "Uranus-234"
+tool.ToolTip = "A highly radioactive chemical element, spread this radiation of your enemies"
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+
+local mes = Instance.new("SpecialMesh", handle)
+mes.MeshId = "rbxassetid://153993888"
+mes.TextureId = "rbxassetid://153993976"
+mes.Scale = Vector3.new(2, 2, 2)
+
+local lastPressTime = 0
+tool.Activated:Connect(function()
+  local currentTime = tick()
+            if currentTime - lastPressTime >= 15 then
+                lastPressTime = currentTime 
+local owner = tool.Parent
+local bottle = handle:Clone()
+bottle.Parent = workspace
+bottle.CanCollide = true
+game.Debris:AddItem(bottle, 12)
+local canspread = true
+
+task.wait(0.5)
+
+for _ = 1, 8 do
+   local kil = Instance.new("Part", bottle)
+   kil.Size = Vector3.new(1, 1, 1)
+   kil.Velocity = (bottle.Position - kil.Position).Unit * -150
+   kil.Position = bottle.Position + Vector3.new(math.random(-8, 8), 5, math.random(-8, 8))
+   kil.Shape = "Ball"
+   kil.Color = Color3.new(0, 0.7, 0)
+   kil.Material = "SmoothPlastic"
+   game.Debris:AddItem(kil, 4)
+   
+   kil.Touched:Connect(function(part)
+      if not part:IsDescendantOf(bottle) and not part:IsDescendantOf(owner) then
+         if part.Parent:FindFirstChildOfClass("Humanoid") then
+            part.Parent:FindFirstChildOfClass("Humanoid"):TakeDamage(5)
+         end
+         kil:Destroy()
+      end
+   end)
+end
+
+local smoke = Instance.new("Smoke", bottle)
+smoke.Color = Color3.new(0, 1, 0)
+smoke.Opacity = 0.2
+smoke.RiseVelocity = 15
+smoke.Size = 1.6
+
+local sound = Instance.new("Sound", bottle)
+sound.SoundId = "rbxassetid://4962360929"
+sound.Volume = 1
+sound.PlaybackSpeed = 1
+sound.Looped = false
+sound:Play()
+
+local loop = Instance.new("Sound", bottle)
+loop.SoundId = "rbxassetid://251407575"
+loop.Volume = 0.6
+loop.PlaybackSpeed = 1
+loop.Looped = true
+loop:Play()
+
+task.delay(8, function()
+ canspread = false
+ smoke.Enabled = false
+ partTweenn2 = game:GetService("TweenService"):Create(loop, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {
+        Volume = 0
+    })
+    partTweenn2:Play()
+end)
+
+task.spawn(function()
+ repeat wait(0.15)
+ local humanoids = {}
+for _, part in next, workspace:GetPartBoundsInRadius(bottle.Position, 50) do
+    if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(owner) then
+      if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+        table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
+      end
+    end
+  end
+
+for _, humanoid in next, humanoids do
+  humanoid:TakeDamage(5)
+  humanoid.RootPart.AssemblyLinearVelocity += (bottle.Position - humanoid.RootPart.Position).Unit * 10
+end
+ until bottle.Parent == nil or canspread == false
+end)
+            end
+end)
