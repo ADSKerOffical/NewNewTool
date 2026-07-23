@@ -1,0 +1,54 @@
+player = player or game.Players.LocalPlayer
+local tool = Instance.new("Tool", player:WaitForChild("Backpack"))
+tool.Name = "Antimatter"
+tool.ToolTip = "Dont touch anything"
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+handle.Shape = "Ball"
+handle.Material = "Neon"
+handle.Color = Color3.new(1, 1, 1)
+handle.Size = Vector3.new(1, 1, 1)
+
+tool.Equipped:Connect(function()
+   task.wait(0.2)
+   local owner = tool.Parent
+   
+   tool:Destroy()
+   local explosion = handle:Clone()
+   explosion.CanCollide = false
+   explosion.CanTouch = false
+   explosion.Anchored = true 
+   explosion.Parent = workspace
+   game.Debris:AddItem(explosion, 10)
+   
+   game:GetService("TweenService"):Create(explosion, TweenInfo.new(2, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out, 0, false, 0), {
+      Size = Vector3.new(300, 300, 300),
+      Color = Color3.new(0, 0, 0),
+      Transparency = 1
+   }):Play()
+   
+   local sound = Instance.new("Sound", workspace)
+   sound.SoundId = "rbxassetid://138741634999819"
+   sound.Volume = 1
+   sound:Play()
+   game.Debris:AddItem(sound, 9)
+   
+   local humanoids = {}
+   for _, part in next, workspace:GetPartBoundsInRadius(explosion.Position, 300) do
+      if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(owner) then
+        if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+          table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
+        end
+      end
+    end
+
+    for _, humanoid in next, humanoids do
+       humanoid:TakeDamage(3000 / (explosion.Position - humanoid.RootPart.Position).Magnitude * 5)
+       humanoid.RootPart.Velocity = (explosion.Position - humanoid.RootPart.Position).Unit * -1000 / (explosion.Position - humanoid.RootPart.Position).Magnitude * 3
+       
+       if (humanoid.RootPart.Position - explosion.Position).Magnitude <= 75 then
+          humanoid:ChangeState("FallingDown")
+       end
+    end
+end)
