@@ -55,7 +55,7 @@ task.spawn(function()
  repeat wait(0.3)
  local humanoids = {}
 for _, part in next, workspace:GetPartBoundsInRadius(bottle.Position, 50) do
-    if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(game.Players.LocalPlayer.Character) then
+    if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(owner) then
       if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
         table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
       end
