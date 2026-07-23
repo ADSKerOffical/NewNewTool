@@ -1,4 +1,5 @@
-local tool = Instance.new("Tool", game.Players.LocalPlayer.Backpack)
+player = player or game.Players.LocalPlayer
+local tool = Instance.new("Tool", player:WaitForChild("Backpack"))
 tool.Name = "Uranus-238"
 tool.ToolTip = "A highly radioactive chemical element, spread this radiation of your enemies"
 
