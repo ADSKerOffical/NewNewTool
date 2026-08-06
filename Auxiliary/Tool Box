@@ -1,0 +1,41 @@
+player = game.Players.ADSKer380
+local tool = Instance.new("Tool", player.Backpack)
+tool.Name = "Tool Box"
+tool.Grip = CFrame.Angles(math.rad(0), 0, 0)
+tool.GripPos = Vector3.new(0, 0, 0)
+tool.ToolTip = "From this box you can get other tools"
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+handle.Size = Vector3.new(1.5, 1.5, 1.5)
+
+for _, face in ipairs(Enum.NormalId:GetEnumItems()) do
+   local mesh = Instance.new("Texture", handle)
+   mesh.Texture = "rbxassetid://5850567969"
+   mesh.Face = face
+end
+
+tool.Activated:Connect(function()
+local box = handle:Clone()
+tool:Destroy()
+box.Parent = workspace
+box.CanCollide = true
+game.Debris:AddItem(box, 10)
+  task.wait(1.5)
+local sound = Instance.new("Sound", box)
+sound.SoundId = "rbxassetid://7846700665"
+sound.Volume = 1.5
+sound.PlaybackSpeed = 1
+sound.Looped = false
+sound:Play()
+   task.wait(1)
+   for i = 1, math.random(1, 6) do
+      local folder = game.ServerStorage.Tools
+      local newTool = folder:GetChildren()[math.random(1, #folder:GetChildren())]
+      if newTool: FindFirstChild("Handle") then
+         newTool.Parent = workspace
+         newTool.Handle.Position = box.Position
+      end
+      task.wait()
+   end
+end)
