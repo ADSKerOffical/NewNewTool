@@ -1,0 +1,99 @@
+player = game.Players.LocalPlayer
+local tool = Instance.new("Tool", player.Backpack)
+tool.Name = "Explosive Bream"
+tool.ToolTip = "Throw a bream in the face at your enemies"
+tool.GripPos = Vector3.new(0, -0.3, 0)
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+
+local fisha = Instance.new("SpecialMesh", handle)
+fisha.MeshId = "rbxassetid://1725219705"
+fisha.TextureId = "rbxassetid://1725222355"
+fisha.Scale = Vector3.new(1, 1, 1)
+fisha.VertexColor = Vector3.new(1, 0, 0)
+
+local lastPressTime = 0
+tool.Activated:Connect(function()
+  local currentTime = tick()
+            if currentTime - lastPressTime >= 6 then
+                lastPressTime = currentTime 
+local owner = tool.Parent
+local pew = Instance.new("Sound", handle)
+pew.SoundId = "rbxassetid://608600954"
+pew.Volume = 1
+pew.PlaybackSpeed = 1
+pew.Looped = false
+pew:Play()
+
+local Anim = Instance.new("Animation")
+Anim.AnimationId = "rbxassetid://209875013"
+local k = owner.Humanoid:LoadAnimation(Anim)
+k:Play()
+k:AdjustSpeed(1)
+
+ local fish = handle:Clone()
+ fish.Parent = workspace
+ fish.CanCollide = true
+ fish.Size *= 2
+ fish.Velocity = owner.HumanoidRootPart.CFrame.LookVector * 450
+ fish:FindFirstChildOfClass("SpecialMesh").Scale *= 2
+ game.Debris:AddItem(fish, 30)
+ 
+ handle.Transparency = 1
+ local partTweenn2 = game:GetService("TweenService"):Create(handle, TweenInfo.new(6, Enum.EasingStyle.Linear), {
+        Transparency = 0
+    })
+    partTweenn2:Play()
+ 
+ local conn = false
+ fish.Touched:Connect(function(hit)
+   if not hit:IsDescendantOf(owner) and conn == false then
+     task.defer(function() fish:Destroy() end)
+     conn = true
+     local core = Instance.new("Part")
+     core.Anchored = true
+     core.Position = fish.Position
+     core.Size = Vector3.zero
+     core.Parent = workspace
+     game.Debris:AddItem(core, 2)
+     
+     local sound = Instance.new("Sound")
+     sound.SoundId = "rbxassetid://573314737"
+     sound.Volume = 1.5
+     sound.Parent = core
+     sound:Play()
+     
+     for _ = 1, 6 do
+        local fishy = fish:Clone()
+        fishy:FindFirstChildOfClass("SpecialMesh").VertexColor = Vector3.new(1, 1, 1)
+        fishy:FindFirstChildOfClass("SpecialMesh").Scale *= 0.35
+        fishy.Position = fish.Position + Vector3.new(math.random(-5, 5), 3, math.random(-5, 5))
+        fishy.AssemblyLinearVelocity = (fish.Position - fishy.Position).Unit * -150
+        fishy.Parent = workspace
+        game.Debris:AddItem(fishy, 6)
+     end
+     
+     local humanoids = {}
+for _, part in next, workspace:GetPartBoundsInRadius(core.Position, 25) do
+    if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(owner) then
+      if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+        table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
+      end
+    end
+  end
+
+     for _, humanoid in next, humanoids do
+        humanoid:TakeDamage(75)
+        humanoid.RootPart.AssemblyLinearVelocity = (core.Position - humanoid.RootPart.Position).Unit * -150
+        humanoid.Sit = true
+     end
+     
+     local explosion = Instance.new("Explosion", workspace)
+     explosion.BlastRadius = 0
+     explosion.Position = core.Position
+     explosion.TimeScale = 0.35
+   end
+ end)
+            end
+end)
