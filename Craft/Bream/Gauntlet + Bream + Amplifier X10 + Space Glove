@@ -1,0 +1,239 @@
+local tool = Instance.new("Tool", game.Players.LocalPlayer.Backpack)
+tool.Name = "Bream God"
+tool.ToolTip = "Behold the power of breams!!!"
+tool.Grip = CFrame.new(0.15, 0.35, -0.25) * CFrame.Angles(math.rad(90), math.rad(180), math.rad(-90))
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+handle.Material = "Neon"
+handle.Color = Color3.new(1, 0, 0)
+
+local mesh = Instance.new("SpecialMesh", handle)
+mesh.MeshId = "rbxassetid://243183921"
+mesh.TextureId = "rbxassetid://1725222355"
+
+local function createFish(parent)
+   local handle = Instance.new("Part", parent or workspace)
+   handle.Name = "Fish"
+
+   local fisha = Instance.new("SpecialMesh", handle)
+   fisha.MeshId = "rbxassetid://1725219705"
+   fisha.TextureId = "rbxassetid://1725222355"
+   fisha.Scale = Vector3.new(1, 1, 1)
+   return handle
+end
+
+local function createExplosion(pos, owner, damage, vel, range, tye)
+   local core
+   if tye == 1 then
+      core = Instance.new("Part")
+      core.Size = Vector3.zero
+      core.Position = pos
+      core.Anchored = true
+      core.Parent = workspace
+      game.Debris:AddItem(core, 5)
+   
+      local explosion = Instance.new("Explosion")
+      explosion.BlastRadius = 0
+      explosion.Position = core.Position
+      explosion.Parent = core
+   elseif tye == 2 then
+      core = Instance.new("Part")
+      core.Position = pos
+      core.Shape = "Ball"
+      core.Anchored = true
+      core.Color = Color3.new(1, 0, 0)
+      core.Parent = workspace
+      game.Debris:AddItem(core, 5)
+      
+      game:GetService("TweenService"):Create(core, TweenInfo.new(1.25, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out, 0, false, 0), {
+         Size = Vector3.new(range, range, range),
+         Transparency = 1,
+         Color = Color3.new(0, 0, 0)
+      }):Play()
+   end
+   
+     local humanoids = {}
+  for _, part in next, workspace:GetPartBoundsInRadius(core.Position, range) do
+      if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(owner) then
+        if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+          table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
+        end
+      end
+    end
+
+   for _, humanoid in next, humanoids do
+      humanoid:TakeDamage(damage)
+      humanoid.RootPart.Velocity = (core.Position - humanoid.RootPart.Position).Unit * -vel
+      if tye == 2 then
+        humanoid:ChangeState("FallingDown")
+      end
+    end
+end
+
+local ScreenGui = Instance.new("ScreenGui", tool)
+ScreenGui.Enabled = false
+    
+local Button = Instance.new("TextButton")
+Button.Name = "Button"
+Button.Size = UDim2.new(0.06, 0.06, 0.06, 6)
+Button.Position = UDim2.new(0.86, 0, 0.4, 0)
+Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.TextScaled = true
+Button.Text = "Breamageddon"
+Button.Parent = ScreenGui
+
+local PurColor = Instance.new("UIGradient", Button)
+PurColor.Color = ColorSequence.new(Color3.new(0.2, 0.2, 0.2), Color3.new(1, 1, 1), Color3.new(0.2, 0.2, 0.2))
+
+local lastPressTimee = 0
+Button.MouseButton1Click:Connect(function()
+   local owner = tool.Parent
+   local currentTime = tick()
+   if currentTime - lastPressTimee >= 15 then
+      lastPressTimee = currentTime
+      
+      local super = createFish()
+      super.Position = handle.Position
+      super.CanCollide = false
+      game.Debris:AddItem(super, 15)
+      
+      super:GetPropertyChangedSignal("Size"):Connect(function()
+         super:FindFirstChildOfClass("SpecialMesh").Scale = super.Size
+      end)
+      
+      local tween = game:GetService("TweenService"):Create(super, TweenInfo.new(2.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out, 0, false, 0), {
+         Size = Vector3.new(10, 10, 10),
+         Position = super.Position + Vector3.new(0, 100, 0)
+      })
+      tween:Play()
+      tween.Completed:Wait()
+      
+      local tim = tick()
+      while task.wait(0.1) and tick() - tim >= 2.5 do
+         local fish = Instance.new("Part")
+         fish.Position = super.Position + Vector3.new(math.random(-20, 20), 0, math.random(-20, 20))
+         fish.Velocity = (super.Position - fish.Position).Unit * math.random(-250, -50)
+         fish.CanCollide = false
+         fish.Parent = workspace
+         
+         local conn = false
+         fish.Touched:Connect(function(part)
+            if not part:IsDescendantOf(super) and conn == false then
+               conn = true
+               createExplosion(fish.Position, owner, 20, 100, 12, 1)
+               fish:Destroy()
+            end
+         end)
+      end
+      
+      super.Anchored = fase
+      super.Velocity = Vector3.zero
+      
+      local conn = false
+      super.Touched:Connect(function(part)
+         createExplosion(super.Position, owner, 150, 300, 35, 2)
+         super:Destroy()
+      end)
+   end
+end)
+
+local lastPressTime = 0
+tool.Activated:Connect(function()
+local currentTime = tick()
+   if currentTime - lastPressTime >= 3 then
+      lastPressTime = currentTime
+local owner = tool.Parent
+local anim = Instance.new("Animation", owner)
+anim.AnimationId = "rbxassetid://243827693"
+game.Debris:AddItem(anim, 10)
+local playAn = owner.Humanoid:LoadAnimation(anim)
+playAn:Play()
+ task.wait(0.25)
+local sound = Instance.new("Sound", handle)
+sound.SoundId = "rbxassetid://1060191237"
+sound.Volume = 3
+sound.PlaybackSpeed = 1
+sound.Looped = false
+sound:Play()
+
+local shockwave = Instance.new("Part", workspace)
+shockwave.Position = handle.Position
+shockwave.Size = Vector3.zero
+shockwave.Material = "SmoothPlastic"
+shockwave.Color = Color3.new(1, 1, 1)
+shockwave.Anchored = true
+shockwave.CanCollide = false
+game.Debris:AddItem(shockwave, 4)
+
+local modelsw = Instance.new("SpecialMesh", shockwave)
+modelsw.Scale = Vector3.new(1, 1, 1)
+modelsw.MeshId = "rbxassetid://173770780"
+
+for i = 1, 16 do
+    local fish = createFish()
+    fish.CanCollide = false
+    fish.Position = handle.Position
+    fish.Velocity = Vector3.new(400 * math.cos(math.rad(22.5 * i)), 0, 400 * math.sin(math.rad(22.5 * i)))
+    game.Debris:AddItem(fish, 8)
+    
+    local conn = false
+    fish.Touched:Connect(function(hit)
+       if not hit:IsDescendantOf(owner) and conn == false then
+          fish.CanCollide = true
+          if hit.Parent:FindFirstChildOfClass("Humanoid") then
+             conn = true
+             local humanoid = hit.Parent:FindFirstChildOfClass("Humanoid")
+             humanoid:TakeDamage(25)
+             humanoid.RootPart.Velocity = (fish.Position - humanoid.RootPart.Position).Unit * -100
+          end
+       end
+    end)
+end
+
+local humanoids = {}
+for _, part in next, workspace:GetPartBoundsInRadius(shockwave.Position, 35) do
+    if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(game.Players.LocalPlayer.Character) then
+      if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+        table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
+      end
+    end
+  end
+
+for _, humanoid in next, humanoids do
+   local pos = (handle.Position - humanoid.RootPart.Position).Magnitude
+   humanoid:TakeDamage(300 / pos * 10)
+   humanoid.RootPart.AssemblyLinearVelocity += (handle.Position - humanoid.RootPart.Position).Unit * -(400 / pos * 7)
+   
+   if pos < 5 then
+      humanoid.Sit = true
+   end
+end
+
+local partTweenn2 = game:GetService("TweenService"):Create(shockwave, TweenInfo.new(0.7, Enum.EasingStyle.Quad), {
+        Transparency = 1
+    })
+    partTweenn2:Play()
+    
+local partTweenn2 = game:GetService("TweenService"):Create(modelsw, TweenInfo.new(0.7, Enum.EasingStyle.Quad), {
+        Scale = Vector3.new(40, 1, 40)
+    })
+    partTweenn2:Play()
+    end
+end)
+
+tool.Destroying:Connect(function()
+   ScreenGui:Destroy()
+end)
+
+tool.Equipped:Connect(function()
+   local owner = tool.Parent
+   ScreenGui.Enabled = true
+   ScreenGui.Parent = game.Players:GetPlayerFromCharacter(owner).PlayerGui
+   mesh.Scale = Vector3.new(2 + (owner:FindFirstChild("Right Arm") and owner:FindFirstChild("Right Arm").Size.X / 1.5 or 0.3), 1.4, 2.3)
+end)
+
+tool.Unequipped:Connect(function()
+   ScreenGui.Enabled = false
+end)
