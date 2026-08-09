@@ -1,0 +1,17 @@
+local compas = Instance.new("Tool", player.Backpack)
+compas.Name = "Compass"
+
+local handle = Instance.new("Part", compas)
+handle.Name = "Handle"
+handle.Color = Color3.new(0.3, 0.3, 0.3)
+
+local mesh = Instance.new("SpecialMesh", handle)
+mesh.MeshId = "rbxassetid://3532235172"
+mesh.Scale = Vector3.new(0.05, 0.05, 0.05)
+
+compass.Equipped:Connect(function()
+   local owner = tool.Parent
+   repeat task.wait(0.1)
+      compass.ToolTip = `X: {string.format("%.2f", owner.HumanoidRootPart.CFrame.X)}\nY: {string.format("%.2f", owner.HumanoidRootPart.CFrame.Y)}\nZ: {string.format("%.2f", owner.HumanoidRootPart.CFrame.Z)}`
+   until not compass or not owner or tool.Parent ~= owner
+end)
