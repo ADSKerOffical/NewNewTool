@@ -1,0 +1,89 @@
+local tool = Instance.new("Tool", game.Players.ADSKer380.Backpack)
+tool.Name = "Flare gun"
+tool.GripPos = Vector3.new(0, -0.2, 0.25)
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+
+local mesh = Instance.new("SpecialMesh", handle)
+mesh.MeshId = "rbxassetid://443983595"
+mesh.TextureId = "rbxassetid://443983604"
+mesh.Scale = Vector3.new(0.02, 0.02, 0.02)
+
+local lastPressTime = 0
+tool.Activated:Connect(function()
+   local currentTime = tick()
+   if currentTime - lastPressTime >= 5 then
+      lastPressTime = currentTime
+      local owner = tool.Parent
+      local player = game.Players:GetPlayerFromCharacter(owner)
+      
+      local bullet = Instance.new("Part")
+      bullet.Shape = "Ball"
+      bullet.Material = "Concrete"
+      bullet.CFrame = owner.HumanoidRootPart.CFrame * CFrame.new(0, 0, -2)
+      bullet.Velocity = player.MousePosition.Value.LookVector * 500
+      bullet.Color = Color3.new(1, 0, 0)
+      bullet.Parent = workspace
+      bullet:SetNetworkOwner(nil)
+      game.Debris:AddItem(bullet, 10)
+      
+      local conn = false
+      bullet.Touched:Connect(function(hit)
+         if not hit:IsDescendantOf(owner) and conn == false then
+            conn = true
+            local explosion = Instance.new("Part")
+            explosion.Position = bullet.Position
+            explosion.CanCollide = false
+            explosion.Anchored = true
+            explosion.Color = Color3.new(1, 0, 0)
+            explosion.Shape = "Ball"
+            explosion.Material = "Neon"
+            explosion.CanQuery = false
+            explosion.CanTouch = false
+            explosion.Parent = workspace
+            game.Debris:AddItem(explosion, 3)
+            bullet:Destroy()
+            
+            game:GetService("TweenService"):Create(explosion, TweenInfo.new(0.55, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0), {
+                Size = Vector3.new(10, 10, 10),
+                Color = Color3.new(0, 0, 0),
+                Transparency = 1
+            }):Play()
+            
+            local humanoids = {}
+    for _, part in next, workspace:GetPartBoundsInRadius(explosion.Position, 10) do
+       if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(owner) then
+         if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+            table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
+          end
+        end
+      end
+
+           for _, humanoid in next, humanoids do
+              local player = game.Players:GetPlayerFromCharacter(humanoid.Parent)
+              humanoid:TakeDamage(20)
+              
+              if (humanoid.Parent.Head.Position - explosion.Position).Magnitude <= 4 then
+                 humanoid:ChangeState("FallingDown")
+                 humanoid:TakeDamage(30)
+                 if player then
+                    game.ReplicatedStorage.BlindEffect:FireClient(player, 4, "FlareGun_BlindEffect")
+                 end
+              end
+           end
+         end
+      end)
+      
+      local sound = Instance.new("Sound")
+      sound.SoundId = "rbxassetid://4502821590"
+      sound.Volume = 1
+      sound.Parent = handle
+      sound:Play()
+      game.Debris:AddItem(sound, 5)
+      
+      local BF = Instance.new("BodyForce")
+      BF.Force = Vector3.new(0, bullet:GetMass() * workspace.Gravity * 0.8, 0)
+      BF.Parent = bullet
+   end
+end)
