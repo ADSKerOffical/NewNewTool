@@ -1,0 +1,94 @@
+local tool = Instance.new("Tool", game.Players.ADSKer380.Backpack)
+tool.Name = "Healing Bomb"
+tool.ToolTip = "Spawns a field that heals not only allies but also enemies"
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+
+local heal = Instance.new("SpecialMesh", handle)
+heal.Scale = Vector3.new(1.2, 1.2, 1.2)
+heal.TextureId = "rbxassetid://91443246"
+heal.MeshId = "rbxassetid://91443046"
+
+tool.Activated:Connect(function()
+  task.defer(function() tool:Destroy() end)
+  local bomb = handle:Clone()
+  bomb.Size = Vector3.new(1, 1, 1)
+  bomb.CanCollide = true
+  bomb.Parent = workspace
+ 
+  local sound = Instance.new("Sound", bomb)
+  sound.SoundId = "rbxassetid://8737379396"
+  sound.Volume = 1
+  sound.PlaybackSpeed = 1
+  sound.Looped = false
+  sound:Play()
+  game.Debris:AddItem(bomb, 25)
+  
+  task.wait(2.5)
+  if not bomb then return end
+  local force = Instance.new("Part")
+  force.CanCollide = false
+  force.CastShadow = false
+  force.CanTouch = false
+  force.CanQuery = false
+  force.Material = "ForceField"
+  force.Shape = "Ball"
+  force.Position = bomb.Position
+  force.Color = Color3.new(0, 1, 0)
+  force.Size = Vector3.zero
+  force.Massless = true
+  force.Parent = bomb
+  
+  local weld = Instance.new("Weld")
+  weld.Part0 = force
+  weld.Part1 = bomb
+  weld.Parent = force
+  
+  local sound = Instance.new("Sound")
+  sound.SoundId = "rbxassetid://9120503525"
+  sound.Volume = 2
+  sound.TimePosition = 0.8
+  sound.PlaybackSpeed = 1
+  sound.Looped = false
+  sound.Parent = force
+  sound:Play()
+  
+  local loop = Instance.new("Sound")
+  loop.SoundId = "rbxassetid://9125566550"
+  loop.Volume = 2.5
+  loop.PlaybackSpeed = 1
+  loop.Looped = true
+  loop.Parent = force
+  loop:Play()
+  
+  local particle = Instance.new("ParticleEmitter")
+  particle.Texture = "https://www.roblox.com/asset-thumbnail/image?assetId=378437962&width=432&height=432&format=png"
+  particle.Speed = NumberRange.new(0, 0)
+  particle.Size = NumberSequence.new(0, 1, 0)
+  particle.Transparency = NumberSequence.new(0, 0, 1)
+  particle.Lifetime = NumberRange.new(1.8, 3)
+  particle.SpreadAngle = Vector2.new(-360, 360)
+  particle.Shape = "Sphere"
+  particle.Parent = force
+  
+  local partTweenn2 = game:GetService("TweenService"):Create(force, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {
+        Size = Vector3.new(50, 50, 50)
+    })
+    partTweenn2:Play()
+  
+    repeat task.wait(0.1)
+      local humanoids = {}
+      for _, part in next, workspace:GetPartBoundsInRadius(force.Position, 42.5) do
+        if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") then
+           if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+             table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
+           end
+        end
+     end
+
+      for _, humanoid in next, humanoids do
+         humanoid.Health += humanoid.MaxHealth / 100
+      end
+    until not bomb or not force
+  end)
