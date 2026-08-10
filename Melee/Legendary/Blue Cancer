@@ -1,0 +1,147 @@
+local tool = Instance.new("Tool", game.Players.ADSKer380.Backpack)
+tool.Name = "Blue Cancer"
+tool.ToolTip = "It claps very loudly"
+tool.Grip = CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
+tool.GripPos = Vector3.new(0, 0, 0)
+tool:SetAttribute("Awakened", fasle)
+
+local mainpart = Instance.new("Part")
+mainpart.Transparency = 0
+mainpart.Name = "Handle"
+mainpart.Size = Vector3.zero
+mainpart.Parent = tool
+
+local arm1p = Instance.new("Part")
+arm1p.Size = Vector3.new(1, 1, 1)
+arm1p.CanCollide = false
+arm1p.Parent = mainpart
+
+local arm2p = Instance.new("Part")
+arm2p.Size = Vector3.new(1, 1, 1)
+arm2p.CanCollide = false
+arm2p.Parent = mainpart
+
+local headp = Instance.new("Part")
+headp.Size = Vector3.new(1, 1, 1)
+headp.Parent = mainpart
+
+local arm1 = Instance.new("SpecialMesh")
+arm1.MeshId = "rbxassetid://13200088262"
+arm1.TextureId = "rbxassetid://13200088371"
+arm1.Scale = Vector3.new(0.6, 0.6, 0.6)
+arm1.Parent = arm1p
+
+local arm2 = arm1:Clone()
+arm2.Parent = arm2p
+
+local head = Instance.new("SpecialMesh")
+head.MeshId = "rbxassetid://13200081913"
+head.TextureId = "rbxassetid://13200082055"
+head.Scale = Vector3.new(0.7, 0.7, 0.7)
+head.Parent = headp
+
+local armjoint1 = Instance.new("Weld")
+armjoint1.Part0 = mainpart
+armjoint1.Part1 = arm1p
+armjoint1.C0 = CFrame.new(-1, 0, -0.3) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
+armjoint1.Parent = mainpart
+
+local armjoint2 = Instance.new("Weld")
+armjoint2.Part0 = mainpart
+armjoint2.Part1 = arm2p
+armjoint2.C0 = CFrame.new(1, 0, -0.3) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(180))
+armjoint2.Parent = mainpart
+
+local headjoint = Instance.new("Weld")
+headjoint.Part0 = mainpart
+headjoint.Part1 = headp
+headjoint.C0 = CFrame.new(0, 0, 0)
+headjoint.Parent = mainpart
+
+local lastPressTime = 0
+tool.Activated:Connect(function()
+  local currentTime = tick()
+            if currentTime - lastPressTime >= 20 then
+                lastPressTime = currentTime 
+local owner = tool.Parent
+local handle = mainpart
+
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://125688676345408"
+sound.Volume = 5
+sound.PlaybackSpeed = 1
+sound.Looped = false
+sound.Parent = handle
+sound:Play()
+game.Debris:AddItem(sound, 5)
+
+local pitch = Instance.new("PitchShiftSoundEffect")
+pitch.Octave = 0.7
+pitch.Priority = math.huge
+pitch.Parent = sound
+
+local shockwave = Instance.new("Part")
+shockwave.CFrame = handle.CFrame
+shockwave.Size = Vector3.zero
+shockwave.Material = "SmoothPlastic"
+shockwave.Color = Color3.new(1, 1, 1)
+shockwave.Anchored = true
+shockwave.CanCollide = false
+shockwave.Parent = workspace
+game.Debris:AddItem(shockwave, 4)
+
+local modelsw = Instance.new("SpecialMesh")
+modelsw.Scale = Vector3.new(1, 1, 1)
+modelsw.MeshId = "rbxassetid://173770780"
+modelsw.Parent = shockwave
+
+local partTweenn2 = game:GetService("TweenService"):Create(shockwave, TweenInfo.new(0.7, Enum.EasingStyle.Quad), {
+        Transparency = 1
+    })
+    partTweenn2:Play()
+    
+local partTweenn2 = game:GetService("TweenService"):Create(modelsw, TweenInfo.new(0.7, Enum.EasingStyle.Quad), {
+        Scale = Vector3.new(120, 1, 120)
+    })
+    partTweenn2:Play()
+
+ local humanoids = {}
+for _, part in next, workspace:GetPartBoundsInRadius(handle.Position, 80) do
+    if part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") and not part:IsDescendantOf(owner) then
+      if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+        table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
+      end
+    end
+  end
+
+for _, humanoid in next, humanoids do 
+  humanoid:TakeDamage(math.clamp(400 / (humanoid.RootPart.Position - handle.Position).Magnitude * 3, 10, 200))
+  humanoid.RootPart.Velocity = (handle.Position - humanoid.RootPart.Position).Unit * -math.clamp(400 / (humanoid.RootPart.Position - handle.Position).Magnitude * 8, 20, 300)
+  
+  if (humanoid.RootPart.Position - handle.Position).Magnitude <= 30 then
+     humanoid.Sit = true
+     humanoid:UnequipTools()
+  elseif (humanoid.RootPart.Position - handle.Position).Magnitude <= 10 then
+     humanoid:ChangeState("FallingDown")
+     humanoid:UnequipTools()
+  end
+end
+            end
+end)
+
+tool.Equipped:Connect(function()
+  if tool:GetAttribute("Awakened") == false then
+    tool.Parent.Humanoid.MaxHealth += 300
+    tool.Parent.Humanoid.Health += 300
+    
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://2261507666"
+    sound.Volume = 2
+    sound.PlaybackSpeed = 1
+    sound.Looped = false
+    sound.Parent = mainpart
+    sound:Play()
+    game.Debris:AddItem(sound, 6)
+    tool:SetAttribute("Awakened", true)
+  end
+end)
