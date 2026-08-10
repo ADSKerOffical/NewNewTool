@@ -1,0 +1,55 @@
+local tool = Instance.new("Tool", game.Players.ADSKer380.Backpack)
+tool.Name = "Spawn point"
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+handle.Size = Vector3.new(2, 0.7, 2)
+handle.Material = "SmoothPlastic"
+
+local spaw = Instance.new("Decal", handle)
+spaw.Texture = "rbxassetid://12224170"
+spaw.Face = Enum.NormalId.Top
+
+tool.Activated:Connect(function()
+   local owner = tool.Parent
+   local player = game.Players:GetPlayerFromCharacter(owner)
+   
+   if not game.Workspace:FindFirstChild("SpawnPointFor_" .. tostring(player.UserId)) then
+      tool:Destroy()
+      local spawp = Instance.new("SpawnLocation")
+      player.RespawnLocation = spawp
+      spawp.Anchored = true
+      spawp.Name = "SpawnPointFor_" .. tostring(player.UserId)
+      spawp.Position = owner.HumanoidRootPart.Position - Vector3.new(0, 2.5, 0)
+      spawp.Material = "SmoothPlastic"
+      spawp.Parent = workspace
+      game.Debris:AddItem(spawp, 600)
+      
+      local sound = Instance.new("Sound")
+      sound.SoundId = "rbxassetid://12221944"
+      sound:Play()
+      game.Debris:AddItem(sound, 3)
+      
+      local decal = Instance.new("Decal")
+      decal.Texture = "rbxassetid://12224170"
+      decal.Face = Enum.NormalId.Top
+      decal.Parent = spawp 
+      
+      game:GetService("TweenService"):Create(spawp, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0), {
+         Size = Vector3.new(7, 1.5, 7)
+      }):Play()
+      
+      owner.Humanoid.Died:Connect(function()
+          if spawp then
+             player.CharacterAdded:Wait()
+             local tween = game:GetService("TweenService"):Create(spawp, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0), {
+                 Transparency = 1
+             })
+             tween:Play()
+             tween.Completed:Connect(function()
+                spawp:Destroy()
+             end)
+          end
+      end)
+   end
+end)
