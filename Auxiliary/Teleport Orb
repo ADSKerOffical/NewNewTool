@@ -1,0 +1,29 @@
+local tool = Instance.new("Tool", game.Players.ADSKer380.Backpack)
+tool.Name = "Teleport Orb"
+tool.ToolTip = "Throw anywhere for teleport in this place"
+
+local handle = Instance.new("Part", tool)
+handle.Name = "Handle"
+handle.Size = Vector3.new(1.5, 1.5, 1.5)
+handle.Color = Color3.new(0, 0, 0.5)
+handle.Material = "CrackedLava"
+handle.Shape = "Ball"
+
+tool.Activated:Connect(function()
+   local owner = tool.Parent
+   local player = game.Players:GetPlayerFromCharacter(owner)
+   
+   tool.ManualActivationOnly = true
+   local pearl = handle:Clone()
+   pearl.Parent = workspace
+   pearl:SetNetworkOwner(nil)
+   tool:Destroy()
+   
+   pearl.Velocity = player.MousePosition.Value.LookVector * 250
+   pearl.Touched:Connect(function(hit)
+      if not hit:IsDescendantOf(owner) then
+         owner.HumanoidRootPart.CFrame = pearl.CFrame
+         pearl:Destroy()
+      end
+   end)
+end)
