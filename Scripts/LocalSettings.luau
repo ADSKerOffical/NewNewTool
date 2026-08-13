@@ -40,11 +40,15 @@ local CloseButton = Instance.new("TextButton")
 CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
 CloseButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
 CloseButton.Text = "–"
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.TextScaled = true
 CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
 CloseButton.Parent = MainFrame
 
 local DropButton = Instance.new("TextButton")
 DropButton.Text = "Drop tool"
+DropButton.TextColor3 = Color3.new(1, 1, 1)
+DropButton.TextScaled = true
 DropButton.BorderColor3 = Color3.new(1, 1, 1)
 DropButton.BackgroundTransparency = 0
 DropButton.Parent = ScrollingFrame
@@ -60,6 +64,14 @@ DropButton.MouseButton1Click:Connect(function()
    else
       ErrorSound:Play()
    end
+end)
+
+local LoadCharButton = DropButton:Clone()
+LoadCharButton.Text = "Load Character (when your character is empty)"
+LoadCharButton.Parent = ScrollingFrame
+
+LoadCharButton.MouseButton1Click:Connect(function()
+   game.ReplicatedStorage.LoadChar:FireServer()
 end)
 
 
